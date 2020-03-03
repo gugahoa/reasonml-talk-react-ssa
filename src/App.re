@@ -1,4 +1,9 @@
 [@react.component]
 let make = () => {
-  <div> {React.string("Hello, world")} </div>;
+  let url = ReasonReactRouter.useUrl();
+
+  switch (url.path) {
+  | [name] => <Greeter name />
+  | _ => <div> {React.string("Hello, world")} </div>
+  };
 };
