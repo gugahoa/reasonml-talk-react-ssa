@@ -19,6 +19,7 @@ let make = () => {
   };
 
   switch (state, url.path) {
+  | (_, ["dogs"]) => <FetchedDogPictures />
   | (LoggedIn({name}), _)
   | (Anonymous, [name]) => <Greeter name />
   | (Anonymous, _) => 
