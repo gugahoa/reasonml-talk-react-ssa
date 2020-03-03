@@ -20,9 +20,11 @@
     "decco": "^1.1.1",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
-    "reason-react": ">=0.7.0"
+    "reason-react": ">=0.7.0",
+    "reason-urql": "^1.5.0"
   },
   "devDependencies": {
+    "@baransu/graphql_ppx_re": "^0.7.1",
     "bs-platform": "^7.0.1",
     "moduleserve": "^0.9.0"
   }
