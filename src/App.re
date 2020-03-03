@@ -14,18 +14,15 @@ let make = () => {
   let url = ReasonReactRouter.useUrl();
   let (state, dispatch) = React.useReducer(reducer, Types.Anonymous);
 
-  let login = () => {
+  let login = (email, password) => {
     dispatch(SetUser(LoggedIn({name: "Gustavo", email: "gustavo@kinase.med.br"})));
   };
 
   switch (state, url.path) {
   | (_, ["dogs"]) => <FetchedDogPictures />
+  | (Anonymous, ["login"]) => <Login login />
   | (LoggedIn({name}), _)
   | (Anonymous, [name]) => <Greeter name />
-  | (Anonymous, _) => 
-  <div>
-    {React.string("Anonymous")} 
-    <button onClick={_ => login()}>{React.string("Login")}</button>
-  </div>
+  | (Anonymous, _) => <div> {React.string("Anonymous")} </div>
   };
 };
