@@ -16,7 +16,11 @@
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
-    "bs-fetch"
+    "bs-fetch",
+    "decco"
   ],
-  "refmt": 3
+  "refmt": 3,
+  "ppx-flags": [
+    "decco/ppx"
+  ]
 }

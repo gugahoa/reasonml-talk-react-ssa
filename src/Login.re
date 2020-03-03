@@ -1,8 +1,9 @@
 [@react.component]
-let make = (~login) => {
+let make = (~login, ~error=?) => {
   let (email, setEmail) = React.useState(() => "");
   let (password, setPassword) = React.useState(() => "");
   <form onSubmit={e => ReactEvent.Form.preventDefault(e)}>
+    <p>{React.string(Belt.Option.getWithDefault(error, ""))}</p>
     <input
       type_="text"
       value=email

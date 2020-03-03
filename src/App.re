@@ -1,18 +1,23 @@
-type state = Types.auth_user;
+type state = {
+  user: Types.auth_user,
+  error: option(string),
+};
 
 type action =
+  | Error
   | SetUser(Types.auth_user);
 
 let reducer = (state, action) => {
   switch (action) {
-  | SetUser(user) => user
+  | SetUser(user) => { error: None, user }
+  | Error => { ...state, error: Some("Erro de login") }
   };
 };
 
 [@react.component]
 let make = () => {
   let url = ReasonReactRouter.useUrl();
-  let (state, dispatch) = React.useReducer(reducer, Types.Anonymous);
+  let (state, dispatch) = React.useReducer(reducer, {user: Types.Anonymous, error: None});
 
   let login = (email, password) => {
     let payload = Js.Dict.empty();
@@ -28,20 +33,20 @@ let make = () => {
       ),
     )
     |> Js.Promise.then_(Fetch.Response.json)
-    |> Js.Promise.then_(resp => Js.Json.decodeObject(resp) |> Belt.Option.getExn |> Js.Promise.resolve)
+    |> Js.Promise.then_(resp => Types.login_resp_decode(resp) |> Js.Promise.resolve)
     |> Js.Promise.then_(resp => {
-         let user = Js.Dict.get(resp, "user")->Belt.Option.flatMap(Js.Json.decodeObject) |> Belt.Option.getExn;
-         let name = Js.Dict.get(user, "name")->Belt.Option.flatMap(Js.Json.decodeString) |> Belt.Option.getExn;
-         let email = Js.Dict.get(user, "email")->Belt.Option.flatMap(Js.Json.decodeString) |> Belt.Option.getExn;
-         dispatch(SetUser(LoggedIn({name, email})));
-         () |> Js.Promise.resolve;
+        switch (resp) {
+        | Ok(login_resp: Types.login_resp) => dispatch(SetUser(LoggedIn(login_resp.user)))
+        | Error(_) => dispatch(Error)
+        };
+       () |> Js.Promise.resolve;
        })
     |> ignore;
   };
 
-  switch (state, url.path) {
+  switch (state.user, url.path) {
   | (_, ["dogs"]) => <FetchedDogPictures />
-  | (Anonymous, ["login"]) => <Login login />
+  | (Anonymous, ["login"]) => <Login login error=?state.error />
   | (LoggedIn({name}), _)
   | (Anonymous, [name]) => <Greeter name />
   | (Anonymous, _) => <div> {React.string("Anonymous")} </div>
