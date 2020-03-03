@@ -2,7 +2,7 @@
 let make = (~login) => {
   let (email, setEmail) = React.useState(() => "");
   let (password, setPassword) = React.useState(() => "");
-  <form>
+  <form onSubmit={e => ReactEvent.Form.preventDefault(e)}>
     <input
       type_="text"
       value=email
