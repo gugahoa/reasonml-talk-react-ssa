@@ -18,12 +18,13 @@ let make = () => {
     dispatch(SetUser(LoggedIn({name: "Gustavo", email: "gustavo@kinase.med.br"})));
   };
 
-  switch (state) {
-    | Anonymous =>
-      switch (url.path) {
-        | [name] => <Greeter name />
-        | _ => <div>{React.string("Anonymous")}</div>
-      }
-    | LoggedIn({ name: name }) => <Greeter name />
-  }
+  switch (state, url.path) {
+  | (LoggedIn({name}), _)
+  | (Anonymous, [name]) => <Greeter name />
+  | (Anonymous, _) => 
+  <div>
+    {React.string("Anonymous")} 
+    <button onClick={_ => login()}>{React.string("Login")}</button>
+  </div>
+  };
 };
