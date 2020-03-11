@@ -15,10 +15,27 @@ module LoginMutation = [%graphql
 ];
 
 [@react.component]
-let make = (~login, ~error=?) => {
-  let (_, executeMutation) = ReasonUrql.Hooks.useDynamicMutation(LoginMutation.definition);
+let make = (~onLogin, ~error=?) => {
+  let (response, executeMutation) =
+    ReasonUrql.Hooks.useDynamicMutation(LoginMutation.definition);
   let (email, setEmail) = React.useState(() => "");
   let (password, setPassword) = React.useState(() => "");
+
+  React.useEffect1(
+    () => {
+      switch (response.response) {
+      | Data(loginResp) when Belt.Option.isSome(loginResp##login) =>
+        loginResp##login
+        ->Belt.Option.map(resp => resp.user)
+        ->Belt.Option.getExn
+        ->onLogin
+      | _ => ()
+      };
+      None;
+    },
+    [|response|],
+  );
+
   <form onSubmit={e => ReactEvent.Form.preventDefault(e)}>
     <p> {React.string(Belt.Option.getWithDefault(error, ""))} </p>
     <input
@@ -39,9 +56,7 @@ let make = (~login, ~error=?) => {
     />
     <button
       type_="submit"
-      onClick={_ =>
-        executeMutation(~email, ~password, ()) |> Js.Promise.then_(resp => {() |> Js.Promise.resolve}) |> ignore
-      }>
+      onClick={_ => executeMutation(~email, ~password, ()) |> ignore}>
       {React.string("Login")}
     </button>
   </form>;
